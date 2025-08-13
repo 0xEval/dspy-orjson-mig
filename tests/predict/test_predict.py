@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pydantic
 import pytest
-import ujson
+import orjson
 from litellm import ModelResponse
 from pydantic import BaseModel, HttpUrl
 
@@ -105,8 +105,8 @@ def test_demos_after_dump_and_load_state():
     assert len(dumped_state["demos"]) == len(original_instance.demos)
     assert dumped_state["demos"][0]["content"] == original_instance.demos[0].content
 
-    saved_state = ujson.dumps(dumped_state)
-    loaded_state = ujson.loads(saved_state)
+    saved_state = orjson.dumps(dumped_state)
+    loaded_state = orjson.loads(saved_state)
 
     new_instance = Predict(TranslateToEnglish)
     new_instance.load_state(loaded_state)
@@ -147,8 +147,8 @@ def test_typed_demos_after_dump_and_load_state():
     assert dumped_state["demos"][0]["items"][0] == {"name": "apple", "quantity": 5}
 
     # Test serialization/deserialization
-    saved_state = ujson.dumps(dumped_state)
-    loaded_state = ujson.loads(saved_state)
+    saved_state = orjson.dumps(dumped_state)
+    loaded_state = orjson.loads(saved_state)
 
     # Test load_state
     new_instance = Predict(InventorySignature)
@@ -202,8 +202,8 @@ def test_typed_demos_after_dump_and_load_state():
 #     assert len(dumped_state["demos"]) == len(original_instance.demos)
 #     assert dumped_state["demos"][0]["input"] == original_instance.demos[0].input.model_dump_json()
 
-#     saved_state = ujson.dumps(dumped_state)
-#     loaded_state = ujson.loads(saved_state)
+#     saved_state = orjson.dumps(dumped_state)
+#     loaded_state = orjson.loads(saved_state)
 
 #     new_instance = TypedPredictor(TypedTranslateToEnglish).predictor
 #     new_instance.load_state(loaded_state)
@@ -711,8 +711,8 @@ def test_dump_state_pydantic_non_primitive_types():
     assert serialized["url"] == "https://www.example.com/"
     assert serialized["created_at"] == "2021-01-01T12:00:00"
 
-    json_str = ujson.dumps(serialized)
-    reloaded = ujson.loads(json_str)
+    json_str = orjson.dumps(serialized)
+    reloaded = orjson.loads(json_str)
     assert reloaded == serialized
 
     predictor = Predict(TestSignature)
@@ -720,8 +720,8 @@ def test_dump_state_pydantic_non_primitive_types():
     predictor.demos = [demo]
 
     state = predictor.dump_state()
-    json_str = ujson.dumps(state)
-    reloaded_state = ujson.loads(json_str)
+    json_str = orjson.dumps(state)
+    reloaded_state = orjson.loads(json_str)
 
     demo_data = reloaded_state["demos"][0]
     assert demo_data["website_info"]["url"] == "https://www.example.com/"

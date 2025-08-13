@@ -5,7 +5,7 @@ from collections.abc import Generator
 from pathlib import Path
 
 import cloudpickle
-import ujson
+import orjson
 
 from dspy.utils.saving import get_dependency_versions
 
@@ -215,8 +215,8 @@ class BaseModule:
                     f"Saving failed with error: {e}. Please remove the non-picklable attributes from your DSPy program, "
                     "or consider using state-only saving by setting `save_program=False`."
                 )
-            with open(path / "metadata.json", "w", encoding="utf-8") as f:
-                ujson.dump(metadata, f, indent=2, ensure_ascii=False)
+            with open(path / "metadata.json", "wb") as f:
+                f.write(orjson.dumps(metadata, option=orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE))
 
             return
 
@@ -224,8 +224,8 @@ class BaseModule:
         state["metadata"] = metadata
         if path.suffix == ".json":
             try:
-                with open(path, "w", encoding="utf-8") as f:
-                    f.write(ujson.dumps(state, indent=2 , ensure_ascii=False))
+                with open(path, "wb") as f:
+                    f.write(orjson.dumps(state, option=orjson.OPT_INDENT_2 | orjson.OPT_APPEND_NEWLINE))
             except Exception as e:
                 raise RuntimeError(
                     f"Failed to save state to {path} with error: {e}. Your DSPy program may contain non "
@@ -248,8 +248,8 @@ class BaseModule:
         path = Path(path)
 
         if path.suffix == ".json":
-            with open(path, encoding="utf-8") as f:
-                state = ujson.loads(f.read())
+            with open(path, "rb") as f:
+                state = orjson.loads(f.read())
         elif path.suffix == ".pkl":
             with open(path, "rb") as f:
                 state = cloudpickle.load(f)
